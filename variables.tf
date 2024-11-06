@@ -1,1 +1,124 @@
+# Common Variables
+## Required
+variable "id" {
+  description = "The unique identifier for this deployment."
+  type        = string
+}
 
+## Optional
+variable "aws_tags" {
+  description = "Additional AWS tags to apply to resources in this module."
+  type        = map(string)
+  default     = {}
+}
+
+
+# TrailWatch
+variable "trailwatch" {
+  description = "Whether to enable the TrailWatch module."
+  type        = bool
+  default     = false
+}
+
+variable "trailwatch_cloudtrail_log_group_name" {
+  description = "The name of the CloudWatch log group storing CloudTrail logs."
+  type        = string
+  nullable    = true
+  default     = null
+  validation {
+    condition     = !var.trailwatch || (var.trailwatch && var.trailwatch_cloudtrail_log_group_name != null)
+    error_message = "Must specify the CloudTrail log group name if TrailWatch is to be used."
+  }
+}
+
+variable "trailwatch_alarm_evaluation_periods" {
+  description = "The number of periods over which data is compared to the specified threshold."
+  type        = number
+  default     = 1
+}
+
+variable "trailwatch_alarm_period" {
+  description = "The period in seconds over which the specified statistic is applied."
+  type        = number
+  default     = 1500
+}
+
+variable "trailwatch_alarm_actions" {
+  description = "The list of actions to execute when the alarm transitions into an ALARM/OK state from any other state."
+  type        = list(string)
+  default     = []
+}
+
+
+# slackbot
+variable "slackbot" {
+  description = "Whether to enable the slackbot (+EventBridge) module."
+  type        = bool
+  default     = false
+}
+
+variable "slackbot_team" {
+  description = "The unique ID for the Slack Team on which to set up the AWS Chatbot integration."
+  type        = string
+  nullable    = true
+  default     = null
+  validation {
+    condition     = !var.slackbot || (var.slackbot && var.slackbot_team != null)
+    error_message = "The Slack Team cannot be null if slackbot is enabled."
+  }
+}
+
+variable "slackbot_channels" {
+  description = "The unique ID for the Slack Channels to which to send notifications."
+  type        = list(string)
+  default     = []
+}
+
+variable "slackbot_events" {
+  description = "The events to trigger Slack messages for (EventBridge)."
+  type        = map(string)
+  default     = {}
+}
+
+# pagebird
+variable "pagebird" {
+  description = "Whether to enable the pagebird webpage monitor."
+  type        = bool
+  default     = false
+}
+
+variable "pagebird_website_urls" {
+  description = "The list of webpages to monitor with pagebird."
+  type        = list(string)
+  default     = []
+  validation {
+    condition     = !var.pagebird || (var.pagebird && length(var.pagebird_website_urls) > 0)
+    error_message = "You must provide at least one website URL when using pagebird."
+  }
+}
+
+# Dev
+variable "db_snapshot_identifier" {
+  type     = string
+  nullable = true
+  default  = null
+}
+
+variable "db_engine_version" {
+  type     = string
+  nullable = true
+  default  = null
+  validation {
+    condition     = var.db_snapshot_identifier != null || var.db_engine_version != null
+    error_message = "Either the engine version or the RDS snapshot ID must be provided"
+  }
+}
+
+variable "db_cluster_instance_count" {
+  type    = number
+  default = 2
+  validation {
+    condition     = var.db_cluster_instance_count > 0
+    error_message = "The cluster instance count must be larger than 0."
+  }
+}
