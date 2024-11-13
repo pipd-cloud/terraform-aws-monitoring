@@ -5,6 +5,21 @@ variable "id" {
   type        = string
 }
 
+variable "vpc_id" {
+  description = "The VPC ID to create security groups."
+  type        = string
+}
+
+variable "vpc_subnet_ids" {
+  description = "The list of subnet IDs to use for the slackbot lambda functions."
+  type        = list(string)
+}
+
+variable "s3_access_logs_bucket" {
+  description = "The name of the S3 bucket to which S3 access logs will be written."
+  type        = string
+}
+
 ## Optional
 variable "aws_tags" {
   description = "Additional AWS tags to apply to resources in this module."
@@ -12,8 +27,8 @@ variable "aws_tags" {
   default     = {}
 }
 
-
-# TrailWatch
+# Module Variables
+## TrailWatch
 variable "trailwatch" {
   description = "Whether to enable the TrailWatch module."
   type        = bool
@@ -50,13 +65,7 @@ variable "trailwatch_alarm_actions" {
 }
 
 
-# slackbot
-variable "slackbot" {
-  description = "Whether to enable the slackbot (+EventBridge) module."
-  type        = bool
-  default     = false
-}
-
+## SlackBot
 variable "slackbot_team" {
   description = "The unique ID for the Slack Team on which to set up the AWS Chatbot integration."
   type        = string
@@ -80,7 +89,7 @@ variable "slackbot_events" {
   default     = {}
 }
 
-# pagebird
+## PageBird
 variable "pagebird" {
   description = "Whether to enable the pagebird webpage monitor."
   type        = bool
@@ -94,31 +103,5 @@ variable "pagebird_website_urls" {
   validation {
     condition     = !var.pagebird || (var.pagebird && length(var.pagebird_website_urls) > 0)
     error_message = "You must provide at least one website URL when using pagebird."
-  }
-}
-
-# Dev
-variable "db_snapshot_identifier" {
-  type     = string
-  nullable = true
-  default  = null
-}
-
-variable "db_engine_version" {
-  type     = string
-  nullable = true
-  default  = null
-  validation {
-    condition     = var.db_snapshot_identifier != null || var.db_engine_version != null
-    error_message = "Either the engine version or the RDS snapshot ID must be provided"
-  }
-}
-
-variable "db_cluster_instance_count" {
-  type    = number
-  default = 2
-  validation {
-    condition     = var.db_cluster_instance_count > 0
-    error_message = "The cluster instance count must be larger than 0."
   }
 }

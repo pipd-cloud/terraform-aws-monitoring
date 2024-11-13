@@ -12,7 +12,6 @@ variable "aws_tags" {
   default     = {}
 }
 
-
 # Module variables
 ## Required
 variable "cloudtrail_log_group_name" {

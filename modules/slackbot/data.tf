@@ -63,7 +63,6 @@ data "aws_iam_policy_document" "slackbot_topic_policy" {
       aws_sns_topic.slackbot_topic.arn
     ]
   }
-
 }
 
 data "aws_iam_policy_document" "slackbot_role_trust_policy" {
@@ -79,8 +78,7 @@ data "aws_iam_policy_document" "slackbot_role_trust_policy" {
 
 data "aws_iam_policy" "slackbot_role_managed_policies" {
   for_each = toset([
-    "AWSResourceExplorerReadOnlyAccess",
-    "CloudWatchReadOnlyAccess"
+    "ReadOnlyAccess"
   ])
   name = each.value
 }

@@ -151,7 +151,14 @@ resource "aws_cloudwatch_metric_alarm" "trailwatch" {
   treat_missing_data  = "ignore"
   alarm_description   = "Alarm that is raised whenever potentially disruptive API actions have been performed."
   threshold           = 1
-  tags                = var.aws_tags
+  tags = merge(
+    {
+      Name = "${var.id}-${each.key}-trailwatch-metric-alarm"
+      TFID = var.id
+    },
+    var.aws_tags
+  )
+
   metric_query {
     id = "m1"
     metric {
@@ -172,7 +179,13 @@ resource "aws_cloudwatch_composite_alarm" "trailwatch" {
   actions_enabled   = true
   alarm_actions     = var.cw_alarm_actions
   ok_actions        = var.cw_alarm_actions
-  tags              = var.aws_tags
+  tags = merge(
+    {
+      Name = "${var.id}-trailwatch-alarm"
+      TFID = var.id
+    },
+    var.aws_tags
+  )
   lifecycle {
     replace_triggered_by = [aws_cloudwatch_metric_alarm.trailwatch]
   }

@@ -1,17 +1,29 @@
 # EventBridge-Chatbot Notification Transformer
 ## IAM Role and Policies
 resource "aws_iam_role" "event_lambda_role" {
-  name               = "${var.id}-event-lambda-role"
+  name_prefix        = "EventLambdaRole_"
   description        = "Role that is assumed by the Event Lambda."
   assume_role_policy = data.aws_iam_policy_document.event_lambda_trust_policy.json
-  tags               = var.aws_tags
+  tags = merge(
+    {
+      Name = "EventLambdaRole"
+      TFID = var.id
+    },
+    var.aws_tags
+  )
 }
 
 resource "aws_iam_policy" "event_lambda_role_inline_policy" {
-  name        = "${var.id}-event-lambda-inline-policy"
+  name_prefix = "EventLambdaSNSAccess_"
   description = "Specific permissions that are granted to the EventBridge Lambda function."
   policy      = data.aws_iam_policy_document.event_lambda_inline_policy.json
-  tags        = var.aws_tags
+  tags = merge(
+    {
+      Name = "EventLambdaSNSAccess"
+      TFID = var.id
+    },
+    var.aws_tags
+  )
 }
 
 resource "aws_iam_role_policy_attachment" "event_lambda_role_managed_policies" {
@@ -26,16 +38,39 @@ resource "aws_iam_role_policy_attachment" "event_lambda_role_inline_policy" {
 }
 
 ## Lambda Function
+resource "aws_security_group" "event_lambda_sg" {
+  name        = "${var.id}-event-lambda-sg"
+  description = "The Security Group to associate with the Event Lambda Function."
+  vpc_id      = var.vpc_id
+}
+
+resource "aws_vpc_security_group_egress_rule" "event_lambda_sg_full" {
+  security_group_id = aws_security_group.event_lambda_sg.id
+  description       = "Allow all egress traffic."
+  ip_protocol       = -1
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
 resource "aws_lambda_function" "event_lambda" {
   function_name = "${var.id}-slackbot-event-lambda"
   filename      = data.archive_file.lambda.output_path
   handler       = "lambda.handler"
   runtime       = "python3.10"
   role          = aws_iam_role.event_lambda_role.arn
-  tags          = var.aws_tags
+  tags = merge(
+    {
+      Name = "${var.id}-slackbot-event-lambda"
+      TFID = var.id
+    },
+    var.aws_tags
+  )
+  vpc_config {
+    security_group_ids = aws_security_group.event_lambda_sg.id
+    subnet_ids         = var.vpc_subnet_ids
+  }
   environment {
     variables = {
-      "TOPIC_ARN" = aws_sns_topic.slackbot_topic.arn
+      TOPIC_ARN = aws_sns_topic.slackbot_topic.arn
     }
   }
 }
@@ -43,7 +78,7 @@ resource "aws_lambda_function" "event_lambda" {
 resource "null_resource" "cleanup" {
   depends_on = [aws_lambda_function.event_lambda]
   triggers = {
-    "always" = timestamp()
+    always = timestamp()
   }
   provisioner "local-exec" {
     command = "rm ${data.archive_file.lambda.output_path}"
@@ -55,7 +90,13 @@ resource "aws_cloudwatch_event_rule" "events" {
   for_each      = var.events
   name          = "${var.id}-${each.key}-event"
   event_pattern = each.value
-  tags          = var.aws_tags
+  tags = merge(
+    {
+      Name = "${var.id}-${each.key}-event"
+      TFID = var.id
+    },
+    var.aws_tags
+  )
 }
 
 resource "aws_cloudwatch_event_target" "slackbot_lambda_target" {
@@ -78,10 +119,16 @@ resource "aws_lambda_permission" "slackbot_lambda_event_trigger" {
 }
 
 # Chatbot
-## SNS Topic
+## SNS Topics
 resource "aws_sns_topic" "slackbot_topic" {
   name = var.id
-  tags = var.aws_tags
+  tags = merge(
+    {
+      Name = var.id
+      TFID = var.id
+    },
+    var.aws_tags
+  )
 }
 
 resource "aws_sns_topic_policy" "slackbot_topic_policy" {
@@ -92,16 +139,28 @@ resource "aws_sns_topic_policy" "slackbot_topic_policy" {
 
 ## IAM Role and Policies
 resource "aws_iam_role" "slackbot_role" {
-  name               = "${var.id}-slackbot-role"
+  name_prefix        = "ChatbotRole_"
   assume_role_policy = data.aws_iam_policy_document.slackbot_role_trust_policy.json
-  tags               = var.aws_tags
+  tags = merge(
+    {
+      Name = "ChatbotRole"
+      TFID = var.id
+    },
+    var.aws_tags
+  )
 }
 
 resource "aws_iam_policy" "slackbot_role_inline_policy" {
-  name        = "${var.id}-slackbot-inline-policy"
-  description = "Specific permissions that are granted to the slackbot assumed role."
+  name_prefix = "ChatbotReadOnlyAccess_"
+  description = "Specific permissions that are granted to the ChatBot assumed role."
   policy      = data.aws_iam_policy_document.slackbot_role_inline_policy.json
-  tags        = var.aws_tags
+  tags = merge(
+    {
+      Name = "ChatbotReadOnlyAccess"
+      TFID = var.id
+    },
+    var.aws_tags
+  )
 }
 
 resource "aws_iam_role_policy_attachment" "slackbot_managed_policies" {
@@ -124,6 +183,12 @@ resource "aws_chatbot_slack_channel_configuration" "slackbot_channel" {
   slack_team_id      = var.slack_team
   slack_channel_id   = each.value
   logging_level      = "ERROR"
-  tags               = var.aws_tags
+  tags = merge(
+    {
+      Name = "${var.id}-slack-channel-${each.value}"
+      TFID = var.id
+    },
+    var.aws_tags
+  )
 }
 

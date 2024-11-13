@@ -20,6 +20,17 @@ variable "events" {
   default     = {}
 }
 
+variable "vpc_id" {
+  description = "The VPC on which the Canary must run."
+  type        = string
+}
+
+variable "vpc_subnet_ids" {
+  description = "The IDs subnets on which the Canary must run."
+  type        = list(string)
+}
+
+
 variable "slack_channels" {
   description = "A list of Slack Channel IDs to send notifications to."
   type        = list(string)

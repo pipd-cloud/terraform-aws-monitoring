@@ -2,6 +2,10 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
+data "aws_s3_bucket" "s3_access_logs_bucket" {
+  bucket = var.s3_access_logs_bucket
+}
+
 data "archive_file" "lambda" {
   type        = "zip"
   source_dir  = "${path.module}/lambda"
@@ -67,3 +71,4 @@ data "aws_iam_policy_document" "canary_role_inline_policy" {
     }
   }
 }
+
