@@ -70,5 +70,12 @@ data "aws_iam_policy_document" "canary_role_inline_policy" {
       values   = ["CloudWatchSynthetics"]
     }
   }
+  statement {
+    actions = [
+      "ec2:CreateNetworkInterface"
+    ]
+    effect    = "Allow"
+    resources = ["arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:network-interface/*"]
+  }
 }
 

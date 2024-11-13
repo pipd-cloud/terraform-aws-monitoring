@@ -4,6 +4,8 @@ locals {
 
 data "aws_caller_identity" "current" {}
 
+data "aws_region" "current" {}
+
 data "archive_file" "lambda" {
   type        = "zip"
   source_dir  = "${path.module}/lambda"
@@ -120,5 +122,12 @@ data "aws_iam_policy_document" "event_lambda_inline_policy" {
     ]
     effect    = "Allow"
     resources = [aws_sns_topic.slackbot_topic.arn]
+  }
+  statement {
+    actions = [
+      "ec2:CreateNetworkInterface"
+    ]
+    effect    = "Allow"
+    resources = ["arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:network-interface/*"]
   }
 }
