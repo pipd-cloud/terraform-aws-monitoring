@@ -84,16 +84,30 @@ resource "aws_iam_role_policy_attachment" "canary_role_inline_policy" {
 }
 
 resource "aws_security_group" "canary_sg" {
-  name        = "${var.id}-event-lambda-sg"
+  name        = "${var.id}-canary-sg"
   description = "The Security Group to associate with the Lambda Function."
   vpc_id      = var.vpc_id
+  tags = merge(
+    {
+      Name = "${var.id}-canary-sg"
+      TFID = var.id
+    },
+    var.aws_tags
+  )
 }
 
 resource "aws_vpc_security_group_egress_rule" "canary_sg_full" {
-  security_group_id = aws_security_group.event_lambda_sg.id
-  description       = "Allow all egress traffic."
+  security_group_id = aws_security_group.canary_sg.id
+  description       = "Allow all outbound traffic."
   ip_protocol       = -1
   cidr_ipv4         = "0.0.0.0/0"
+  tags = merge(
+    {
+      Name = "${var.id}-canary-sg-outbound"
+      TFID = var.id
+    },
+    var.aws_tags
+  )
 }
 
 resource "aws_synthetics_canary" "canary" {

@@ -69,12 +69,6 @@ variable "trailwatch_alarm_actions" {
 variable "slackbot_team" {
   description = "The unique ID for the Slack Team on which to set up the AWS Chatbot integration."
   type        = string
-  nullable    = true
-  default     = null
-  validation {
-    condition     = !var.slackbot || (var.slackbot && var.slackbot_team != null)
-    error_message = "The Slack Team cannot be null if slackbot is enabled."
-  }
 }
 
 variable "slackbot_channels" {
