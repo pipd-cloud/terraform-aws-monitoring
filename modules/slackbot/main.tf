@@ -65,7 +65,7 @@ resource "aws_lambda_function" "event_lambda" {
     var.aws_tags
   )
   vpc_config {
-    security_group_ids = aws_security_group.event_lambda_sg.id
+    security_group_ids = [aws_security_group.event_lambda_sg.id]
     subnet_ids         = var.vpc_subnet_ids
   }
   environment {

@@ -132,7 +132,7 @@ resource "aws_synthetics_canary" "canary" {
   )
 
   vpc_config {
-    security_group_ids = aws_security_group.canary_sg.id
+    security_group_ids = [aws_security_group.canary_sg.id]
     subnet_ids         = var.vpc_subnet_ids
   }
 
