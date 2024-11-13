@@ -72,10 +72,18 @@ data "aws_iam_policy_document" "canary_role_inline_policy" {
   }
   statement {
     actions = [
-      "ec2:CreateNetworkInterface"
+      "ec2:CreateNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeVpcs",
+      "ec2:DeleteNetworkInterface",
+      "ec2:AssignPrivateIpAddresses",
+      "ec2:UnassignPrivateIpAddresses",
+      "ec2:CreateTags"
     ]
     effect    = "Allow"
-    resources = ["arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:network-interface/*"]
+    resources = ["*"]
   }
 }
 
