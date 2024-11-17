@@ -137,7 +137,7 @@ resource "aws_synthetics_canary" "canary" {
   }
 
   schedule {
-    expression = "rate(1 minute)"
+    expression = var.frequency
   }
   run_config {
     environment_variables = {

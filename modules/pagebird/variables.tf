@@ -36,3 +36,9 @@ variable "s3_access_logs_bucket" {
   description = "The name of the S3 bucket to which S3 access logs will be written."
   type        = string
 }
+
+variable "frequency" {
+  description = "The rate at which pagebird must be run."
+  type        = string
+  default     = "rate(5 minutes)"
+}

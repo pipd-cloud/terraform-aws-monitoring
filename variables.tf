@@ -99,3 +99,9 @@ variable "pagebird_website_urls" {
     error_message = "You must provide at least one website URL when using pagebird."
   }
 }
+
+variable "pagebird_frequency" {
+  description = "The rate at which pagebird must be run."
+  type        = string
+  default     = "rate(5 minutes)"
+}
