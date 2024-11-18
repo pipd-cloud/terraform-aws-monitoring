@@ -10,7 +10,8 @@ locals {
           "DeleteInternetGateway",
           "DeleteNatGateway",
           "DeleteRouteTable",
-          "DeleteFlowLogs"
+          "DeleteFlowLogs",
+          "DeleteVpcEndpoints"
         ]
       }
       namespace   = "TrailWatch"
@@ -22,7 +23,9 @@ locals {
         event_name = [
           "DeleteSecurityGroup",
           "RevokeSecurityGroupIngress",
-          "RevokeSecurityGroupEgress"
+          "RevokeSecurityGroupEgress",
+          "AuthorizeSecurityGroupIngress",
+          "AuthorizeSecurityGroupEgress"
         ]
       }
       namespace   = "TrailWatch/EC2"
@@ -38,8 +41,6 @@ locals {
           "DeleteTargetGroup",
           "DeregisterTargets",
           "ModifyListener",
-          "ModifyLoadBalancerAttributes",
-          "SetSecurityGroups",
           "SetSubnets"
         ]
       }
@@ -55,9 +56,7 @@ locals {
           "DeleteRuleGroup",
           "DeleteWebACL",
           "DisassociateWebACL",
-          "UpdateIPSet",
           "UpdateRuleGroup",
-          "UpdateWebACL"
         ]
       }
       namespace   = "TrailWatch"
@@ -71,9 +70,7 @@ locals {
           "DeleteService",
           "DeleteTaskDefinitions",
           "DeleteTaskSet",
-          "DeregisterContainerInstance",
-          "StopTask",
-          "UpdateService"
+          "DeregisterContainerInstance"
         ]
       }
       namespace   = "TrailWatch"
@@ -86,8 +83,7 @@ locals {
           "DeleteRepository",
           "DeleteLifecyclePolicy",
           "DeleteRegistryPolicy",
-          "DeleteRepositoryPolicy",
-          "BatchDeleteImage"
+          "DeleteRepositoryPolicy"
         ]
       }
       namespace   = "TrailWatch"
@@ -100,9 +96,9 @@ locals {
           "StopDBInstance",
           "DeleteDBInstance",
           "RebootDBInstance",
-          "ModifyDBInstance",
           "DeleteDBSnapshot",
           "DeleteDBCluster",
+          "DeleteDBClusterSnapshot",
           "FailoverDBCluster",
           "StopDBCluster",
           "RebootDBCluster"
@@ -125,6 +121,34 @@ locals {
       namespace   = "TrailWatch"
       metric_name = "ElastiCache"
     }
+    s3 = {
+      pattern = {
+        event_source = "s3.amazonaws.com"
+        event_name = [
+          "DeleteBucket",
+          "DeleteObject",
+          "PutBucketPolicy",
+          "DeleteBucketPolicy",
+          "PutBucketAcl",
+          "DeleteAccessPoint"
+        ]
+      }
+      namespace   = "TrailWatch"
+      metric_name = "S3"
+    },
+    cloudtrail = {
+      pattern = {
+        event_source = "cloudtrail.amazonaws.com"
+        event_name = [
+          "DeleteTrail",
+          "StopLogging",
+          "UpdateTrail"
+        ]
+      }
+      namespace   = "TrailWatch"
+      metric_name = "CloudTrail"
+    }
+
   }
 }
 
