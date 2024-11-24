@@ -21,12 +21,15 @@ module "trailwatch" {
 }
 
 module "pagebird" {
-  count                 = var.pagebird ? 1 : 0
-  source                = "./modules/pagebird"
-  id                    = var.id
-  aws_tags              = var.aws_tags
-  website_urls          = var.pagebird_website_urls
-  vpc_id                = var.vpc_id
-  vpc_subnet_ids        = var.vpc_subnet_ids
-  s3_access_logs_bucket = var.s3_access_logs_bucket
+  count                       = var.pagebird ? 1 : 0
+  source                      = "./modules/pagebird"
+  id                          = var.id
+  aws_tags                    = var.aws_tags
+  website_urls                = var.pagebird_website_urls
+  vpc_id                      = var.vpc_id
+  vpc_subnet_ids              = var.vpc_subnet_ids
+  s3_access_logs_bucket       = var.s3_access_logs_bucket
+  cw_alarm_actions            = concat([module.slackbot.slackbot_sns_topic.arn], var.pagebird_alarm_actions)
+  cw_alarm_evaluation_periods = var.trailwatch_alarm_evaluation_periods
+  cw_alarm_period             = var.trailwatch_alarm_period
 }

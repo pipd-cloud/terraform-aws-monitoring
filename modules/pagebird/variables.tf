@@ -42,3 +42,21 @@ variable "frequency" {
   type        = string
   default     = "rate(5 minutes)"
 }
+
+variable "cw_alarm_evaluation_periods" {
+  description = "The number of periods over which data is compared to the specified threshold."
+  type        = number
+  default     = 1
+}
+
+variable "cw_alarm_period" {
+  description = "The period in seconds over which the specified statistic is applied."
+  type        = number
+  default     = 300
+}
+
+variable "cw_alarm_actions" {
+  description = "The list of actions to execute when the alarm transitions into an ALARM/OK state from any other state."
+  type        = list(string)
+  default     = []
+}

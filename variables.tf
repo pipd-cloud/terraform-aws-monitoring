@@ -83,6 +83,12 @@ variable "slackbot_events" {
   default     = {}
 }
 
+variable "slackbot_topic_arns" {
+  description = "Additional SNS topics to listen to."
+  type        = list(string)
+  default     = []
+}
+
 ## PageBird
 variable "pagebird" {
   description = "Whether to enable the pagebird webpage monitor."
@@ -104,4 +110,10 @@ variable "pagebird_frequency" {
   description = "The rate at which pagebird must be run."
   type        = string
   default     = "rate(5 minutes)"
+}
+
+variable "pagebird_alarm_actions" {
+  description = "The list of actions to execute when the alarm transitions into an ALARM/OK state from any other state."
+  type        = list(string)
+  default     = []
 }

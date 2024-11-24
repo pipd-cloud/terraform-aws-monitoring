@@ -29,7 +29,7 @@ variable "cw_alarm_evaluation_periods" {
 variable "cw_alarm_period" {
   description = "The period in seconds over which the specified statistic is applied."
   type        = number
-  default     = 1500
+  default     = 300
 }
 
 variable "cw_alarm_actions" {

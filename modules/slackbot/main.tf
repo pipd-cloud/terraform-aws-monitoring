@@ -194,7 +194,7 @@ resource "aws_chatbot_slack_channel_configuration" "slackbot_channel" {
   for_each           = toset(var.slack_channels)
   configuration_name = "${var.id}-slack-channel-${each.value}"
   iam_role_arn       = aws_iam_role.slackbot_role.arn
-  sns_topic_arns     = [aws_sns_topic.slackbot_topic.arn]
+  sns_topic_arns     = concat([aws_sns_topic.slackbot_topic.arn], var.sns_topic_arns)
   slack_team_id      = var.slack_team
   slack_channel_id   = each.value
   logging_level      = "ERROR"

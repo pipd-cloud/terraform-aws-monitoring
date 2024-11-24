@@ -40,3 +40,9 @@ variable "slack_team" {
   description = "The Slack Workspace ID associated with the slackbot."
   type        = string
 }
+
+variable "sns_topic_arns" {
+  description = "Additional SNS topics to listen to."
+  type        = list(string)
+  default     = []
+}

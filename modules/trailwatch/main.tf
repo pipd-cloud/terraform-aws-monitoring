@@ -174,6 +174,8 @@ resource "aws_cloudwatch_metric_alarm" "trailwatch" {
   evaluation_periods  = var.cw_alarm_evaluation_periods
   treat_missing_data  = "ignore"
   alarm_description   = "Alarm that is raised whenever potentially disruptive API actions have been performed."
+  alarm_actions       = var.cw_alarm_actions
+  ok_actions          = var.cw_alarm_actions
   threshold           = 1
   tags = merge(
     {
@@ -196,21 +198,3 @@ resource "aws_cloudwatch_metric_alarm" "trailwatch" {
   }
 }
 
-resource "aws_cloudwatch_composite_alarm" "trailwatch" {
-  alarm_name        = "${var.id}-trailwatch-alarm"
-  alarm_rule        = join(" OR ", [for alarm in aws_cloudwatch_metric_alarm.trailwatch : "ALARM(\"${alarm.alarm_name}\")"])
-  alarm_description = "Alarm that is raised whenever potentially disruptive API actions have been performed."
-  actions_enabled   = true
-  alarm_actions     = var.cw_alarm_actions
-  ok_actions        = var.cw_alarm_actions
-  tags = merge(
-    {
-      Name = "${var.id}-trailwatch-alarm"
-      TFID = var.id
-    },
-    var.aws_tags
-  )
-  lifecycle {
-    replace_triggered_by = [aws_cloudwatch_metric_alarm.trailwatch]
-  }
-}

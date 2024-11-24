@@ -155,3 +155,38 @@ resource "null_resource" "cleanup" {
     command = "rm -rf ${data.archive_file.lambda.output_path}"
   }
 }
+
+resource "aws_cloudwatch_metric_alarm" "trailwatch" {
+  alarm_name          = "${var.id}-pagebird-alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = var.cw_alarm_evaluation_periods
+  treat_missing_data  = "ignore"
+  alarm_description   = "Alarm that is raised whenever any of the website URLS provided for this deployment are down."
+  alarm_actions       = var.cw_alarm_actions
+  ok_actions          = var.cw_alarm_actions
+  threshold           = 1
+  tags = merge(
+    {
+      Name = "${var.id}-pagebird-alarm"
+      TFID = var.id
+    },
+    var.aws_tags
+  )
+
+  metric_query {
+    id = "m1"
+    metric {
+      metric_name = "FailedFailed requests"
+      namespace   = "CloudWatchSynthetics"
+      dimensions = {
+        "CanaryName" : aws_synthetics_canary.canary.name
+      }
+      period = var.cw_alarm_period
+      stat   = "Sum"
+      unit   = "Count"
+    }
+    return_data = true
+  }
+}
+
+
