@@ -176,7 +176,7 @@ resource "aws_cloudwatch_metric_alarm" "trailwatch" {
   metric_query {
     id = "m1"
     metric {
-      metric_name = "FailedFailed requests"
+      metric_name = "Failed requests"
       namespace   = "CloudWatchSynthetics"
       dimensions = {
         "CanaryName" : aws_synthetics_canary.canary.name

@@ -30,6 +30,6 @@ module "pagebird" {
   vpc_subnet_ids              = var.vpc_subnet_ids
   s3_access_logs_bucket       = var.s3_access_logs_bucket
   cw_alarm_actions            = concat([module.slackbot.slackbot_sns_topic.arn], var.pagebird_alarm_actions)
-  cw_alarm_evaluation_periods = var.trailwatch_alarm_evaluation_periods
-  cw_alarm_period             = var.trailwatch_alarm_period
+  cw_alarm_evaluation_periods = var.pagebird_alarm_evaluation_periods
+  cw_alarm_period             = var.pagebird_alarm_period
 }

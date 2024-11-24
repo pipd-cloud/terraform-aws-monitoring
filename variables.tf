@@ -55,7 +55,7 @@ variable "trailwatch_alarm_evaluation_periods" {
 variable "trailwatch_alarm_period" {
   description = "The period in seconds over which the specified statistic is applied."
   type        = number
-  default     = 1500
+  default     = 300
 }
 
 variable "trailwatch_alarm_actions" {
@@ -110,6 +110,18 @@ variable "pagebird_frequency" {
   description = "The rate at which pagebird must be run."
   type        = string
   default     = "rate(5 minutes)"
+}
+
+variable "pagebird_alarm_evaluation_periods" {
+  description = "The number of periods over which data is compared to the specified threshold."
+  type        = number
+  default     = 1
+}
+
+variable "pagebird_alarm_period" {
+  description = "The period in seconds over which the specified statistic is applied."
+  type        = number
+  default     = 300
 }
 
 variable "pagebird_alarm_actions" {
