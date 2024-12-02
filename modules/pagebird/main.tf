@@ -161,7 +161,7 @@ resource "aws_cloudwatch_metric_alarm" "trailwatch" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = var.cw_alarm_evaluation_periods
   treat_missing_data  = "ignore"
-  alarm_description   = "Alarm that is raised whenever any of the website URLS provided for this deployment are down."
+  alarm_description   = "Alarm that is raised whenever any of the website URLs provided for this deployment are down."
   alarm_actions       = var.cw_alarm_actions
   ok_actions          = var.cw_alarm_actions
   threshold           = 1
