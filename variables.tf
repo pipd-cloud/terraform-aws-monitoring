@@ -18,6 +18,8 @@ variable "vpc_subnet_ids" {
 variable "s3_access_logs_bucket" {
   description = "The name of the S3 bucket to which S3 access logs will be written."
   type        = string
+  nullable    = true
+  default     = null
 }
 
 ## Optional
@@ -63,6 +65,7 @@ variable "trailwatch_alarm_actions" {
   type        = list(string)
   default     = []
 }
+
 
 
 ## SlackBot
@@ -128,4 +131,15 @@ variable "pagebird_alarm_actions" {
   description = "The list of actions to execute when the alarm transitions into an ALARM/OK state from any other state."
   type        = list(string)
   default     = []
+}
+
+variable "pagebird_s3_access_logs_bucket" {
+  description = "The name of the S3 bucket to which S3 access logs will be written."
+  type        = string
+  nullable    = true
+  default     = null
+  validation {
+    condition     = !var.pagebird || (var.pagebird && (var.pagebird_s3_access_logs_bucket != null || var.s3_access_logs_bucket != null))
+    error_message = "You must specify a bucket for S3 access logs if using pagebird."
+  }
 }
