@@ -143,7 +143,7 @@ class ChatBotNotification(ABC):
 
 
 @dataclass
-class BedrockPrompt:
+class LLAMA3Prompt:
     """Dataclass for the Bedrock prompt."""
 
     prompt: str
@@ -170,7 +170,7 @@ class BedrockHandler:
             "contentType": "application/json",
             "body": json.dumps(
                 asdict(
-                    BedrockPrompt(
+                    LLAMA3Prompt(
                         PROMPT.format(event_string=json.dumps(asdict(event))),
                     ),
                 ),
