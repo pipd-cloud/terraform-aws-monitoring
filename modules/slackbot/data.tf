@@ -138,4 +138,11 @@ data "aws_iam_policy_document" "event_lambda_inline_policy" {
     effect    = "Allow"
     resources = ["*"]
   }
+  statement {
+    actions = [
+      "bedrock:InvokeModel"
+    ]
+    effect    = "Allow"
+    resources = ["arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro*"]
+  }
 }
