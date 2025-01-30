@@ -1,8 +1,9 @@
-"""Eventbridge-to-Chatbot notification Transformer
+"""Eventbridge-to-Chatbot notification Transformer.
 
 This simple Lambda function accepts EventBridge Events and
 converts them into notifications that AWS Chatbot can interpret.
 """
+
 from __future__ import annotations
 
 import json
@@ -17,6 +18,18 @@ import boto3
 
 T = TypeVar("T", bound="AWSEvent")
 LOGGER = logging.getLogger(__name__)
+PROMPT = (
+    "Given the following AWS EventBridge event in JSON format, please "
+    "generate a concise sentence that describes the content of the event, "
+    "including any relevant details such as source and specific event "
+    "information. Do not include times. Only include the sentence in "
+    "your response. If the event is negative (e.g. warning, error), then "
+    "indicate with a :rotating_light:. If the event is neutral (e.g., information, "
+    "in-progress), then indicate with a :bulb:. If the event is positive "
+    "(e.g. complete, success) then indicate with a :white_check_mark:. \n\n"
+    "AWS EventBridge Event (JSON): \n{event_string}"
+)
+
 
 @dataclass(kw_only=True)
 class AWSEvent:
@@ -77,7 +90,6 @@ class EventBridgeEvent(AWSEvent):
     resources: list[str]
 
 
-
 @dataclass
 class ChatBotNotificationContent:
     """Contains the content that Chatbot displays."""
@@ -88,7 +100,7 @@ class ChatBotNotificationContent:
 
 @dataclass
 class ChatBotNotificationData:
-    "Contains the required headers for Chatbot notifications."
+    """Contains the required headers for Chatbot notifications."""
 
     content: ChatBotNotificationContent
     version: str = "1.0"
@@ -130,6 +142,48 @@ class ChatBotNotification(ABC):
         )
 
 
+@dataclass
+class BedrockPrompt:
+    """Dataclass for the Bedrock prompt."""
+
+    prompt: str
+    max_gen_len: int = 128  # int(os.environ.get("MAX_TOKENS", 128))
+    temperature: float = 0.5  # float(os.environ.get("TEMPERATURE", 0.5))
+    top_p: float = 0.9  # float(os.environ.get("TOP_P", 0.9))
+
+
+class BedrockHandler:
+    """Handler that interacts with AWS Bedrock."""
+
+    def __init__(self: BedrockHandler) -> None:
+        """Initialise the BedrockHandler."""
+        self.__bedrock_runtime = boto3.client(
+            "bedrock-runtime",
+            region_name="us-east-1",
+        )
+
+    def generate_request(self: BedrockHandler, event: EventBridgeEvent) -> dict:
+        """Generate a request for the Bedrock runtime."""
+        return {
+            "modelId": "us.meta.llama3-3-70b-instruct-v1:0",
+            "accept": "application/json",
+            "contentType": "application/json",
+            "body": json.dumps(
+                asdict(
+                    BedrockPrompt(
+                        PROMPT.format(event_string=json.dumps(asdict(event))),
+                    ),
+                ),
+            ),
+        }
+
+    def get_response(self: BedrockHandler, event: EventBridgeEvent) -> str:
+        """Get a response from the Bedrock runtime."""
+        response = self.__bedrock_runtime.invoke_model(**self.generate_request(event))
+        body = json.loads(response.get("body").read())
+        return body.get("generation")
+
+
 class EventBridgeNotification(ChatBotNotification):
     """Generic EventBridge notification."""
 
@@ -144,28 +198,41 @@ class EventBridgeNotification(ChatBotNotification):
 
     @classmethod
     def from_event(
-        cls: type[EventBridgeNotification], event: dict
+        cls: type[EventBridgeNotification],
+        event: dict,
     ) -> EventBridgeNotification:
         """Create a notification object from an EventBridge event."""
         return cls(EventBridgeEvent.from_dict(event))
 
-    def __compile_message(self: EventBridgeNotification) -> None:
+    def compose_message(
+        self: EventBridgeNotification,
+        *,
+        use_ai: bool = False,
+    ) -> None:
         """Compile the EventBridge event into a formatted string."""
-        detail = "\n".join(f"{k}: {v}" for k, v in self.event.detail.items())
-        resources = "\n".join(resource for resource in self.event.resources)
-        self.text = (f"*:loudspeaker: [{self.event.source.upper()}]: "
-                     f"{self.event.detail_type} :loudspeaker:*\n\n")
-        self.text += f"*AWS Account*\n```{self.event.account}```\n\n"
-        self.text += f"*AWS Region* \n```{self.event.region}```\n\n"
-        self.text += f"*Resources*\n```{resources}```\n\n"
-        self.text += f"*Detail*\n```{detail}```"
+        if use_ai:
+            bedrock = BedrockHandler()
+            self.text = bedrock.get_response(event=self.event)
+        else:
+            detail = "\n".join(f"{k}: {v}" for k, v in self.event.detail.items())
+            resources = "\n".join(resource for resource in self.event.resources)
+            self.text = (
+                f"*:loudspeaker: [{self.event.source.upper()}]: "
+                f"{self.event.detail_type} :loudspeaker:*\n\n"
+            )
+            self.text += f"*AWS Account*\n```{self.event.account}```\n\n"
+            self.text += f"*AWS Region* \n```{self.event.region}```\n\n"
+            self.text += f"*Resources*\n```{resources}```\n\n"
+            self.text += f"*Detail*\n```{detail}```"
 
-    def send_message(self: EventBridgeNotification) -> None:
+    def send_message(self: EventBridgeNotification, *, use_ai: bool = False) -> None:
         """Send the EventBridge notification to ChatBot."""
-        self.__compile_message()
+        self.compose_message(use_ai=use_ai)
         return super().send_message()
 
 
 def handler(event: dict, _: dict) -> None:
     """Send the eventbridge event."""
-    EventBridgeNotification.from_event(event).send_message()
+    EventBridgeNotification.from_event(event).send_message(
+        use_ai=os.environ.get("USE_AI", "True") == "True",
+    )
