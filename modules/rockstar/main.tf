@@ -70,6 +70,7 @@ resource "aws_lambda_function" "event_lambda" {
   filename      = data.archive_file.lambda.output_path
   handler       = "lambda.handler"
   runtime       = "python3.10"
+  timeout       = 15
   role          = aws_iam_role.event_lambda_role.arn
   tags = merge(
     {
