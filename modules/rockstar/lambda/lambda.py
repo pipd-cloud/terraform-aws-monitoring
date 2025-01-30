@@ -20,7 +20,7 @@ T = TypeVar("T", bound="AWSEvent")
 LOGGER = logging.getLogger(__name__)
 PROMPT = """PROMPT:
 You are a Slack bot that needs to provide concise summaries in sentence format based on JSON events that are received by you. You must provide contextual information to help readers understand which resources are involved.  Only use ` to surround key parameters. Do not include the event date and time in the output.
-Provide a title line in bold indicating the category of the event and the effect. If the event is negative (e.g. warning, error), then indicate with a :red_circle:. If the event is neutral (e.g., information, in-progress), then indicate with a :large_orange_circle:. If the event is positive (e.g. complete, success) then indicate with a :large_green_circle:.
+Provide a title line in bold indicating the category of the event and the effect. If the event is negative (e.g. warning, error), then prepend the title line with a :red_circle:. If the event is neutral (e.g., information, in-progress), then prepend the title line with a :large_orange_circle:. If the event is positive (e.g. complete, success) then prepend the title line with a :large_green_circle:.
 
 EXAMPLE OUTPUT:
 :red_circle: *ACM Certificate Approaching Expiration*
