@@ -19,11 +19,11 @@ import boto3
 T = TypeVar("T", bound="AWSEvent")
 LOGGER = logging.getLogger(__name__)
 PROMPT = """PROMPT:
-You are a Slack bot that needs to provide concise summaries in sentence format based on JSON events that are received by you. You must provide contextual information to help readers understand which resources are involved.  Only use ` to surround key parameters.
-Provide a title line in bold indicating the category of the event and the effect. If the event is negative (e.g. warning, error), then indicate with a :rotating_light:. If the event is neutral (e.g., information, in-progress), then indicate with a :bulb:. If the event is positive (e.g. complete, success) then indicate with a :white_check_mark:.
+You are a Slack bot that needs to provide concise summaries in sentence format based on JSON events that are received by you. You must provide contextual information to help readers understand which resources are involved.  Only use ` to surround key parameters. Do not include the event date and time in the output.
+Provide a title line in bold indicating the category of the event and the effect. If the event is negative (e.g. warning, error), then indicate with a :red_circle:. If the event is neutral (e.g., information, in-progress), then indicate with a :large_orange_circle:. If the event is positive (e.g. complete, success) then indicate with a :large_green_circle:.
 
 EXAMPLE OUTPUT:
-:rotating_light: **ACM Certificate Approaching Expiration**
+:red_circle: *ACM Certificate Approaching Expiration*
 An ACM certificate for `example.com` (`arn:aws:acm:us-east-1:123456789012:certificate/61f50cd4-45b9-4259-b049-d0a53682fa4b`) is nearing its expiration in 31 days.
 
 JSON EVENT:
