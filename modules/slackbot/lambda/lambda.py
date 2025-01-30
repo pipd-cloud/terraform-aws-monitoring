@@ -11,25 +11,17 @@ import logging
 import os
 import re
 from abc import ABC
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from typing import Any, TypeVar
 
 import boto3
 
 T = TypeVar("T", bound="AWSEvent")
 LOGGER = logging.getLogger(__name__)
-PROMPT = (
-    "Given the following AWS EventBridge event in JSON format, please "
-    "generate a concise sentence that describes the content of the event, "
-    "including any relevant details such as source and specific event "
-    "information. Do not include times. Only include the sentence in "
-    "your response. If the event is negative (e.g. warning, error), then "
-    "indicate with a :rotating_light:. If the event is neutral (e.g., information, "
-    "in-progress), then indicate with a :bulb:. If the event is positive "
-    "(e.g. complete, success) then indicate with a :white_check_mark:. \n\n"
-    "AWS EventBridge Event (JSON): \n{event_string}"
-)
-
+PROMPT = """You are a chat bot that needs to provide concise summaries in sentence format based on JSON events that are received by you. You must provide contextual information to help readers understand which resources are involved.
+If the event is negative (e.g. warning, error), then indicate with a :rotating_light:. If the event is neutral (e.g., information, in-progress), then indicate with a :bulb:. If the event is positive (e.g. complete, success) then indicate with a :white_check_mark:.
+JSON EVENT:
+{event_string}""" 
 
 @dataclass(kw_only=True)
 class AWSEvent:
@@ -141,16 +133,24 @@ class ChatBotNotification(ABC):
             TopicArn=os.environ["TOPIC_ARN"],
         )
 
+@dataclass
+class AWSNovaPrompt:
+    text: str
 
 @dataclass
-class LLAMA3Prompt:
-    """Dataclass for the Bedrock prompt."""
+class AWSNovaMessage:
+    content: list[AWSNovaPrompt]
+    role: str = "user"
 
-    prompt: str
-    max_gen_len: int = 128  # int(os.environ.get("MAX_TOKENS", 128))
-    temperature: float = 0.5  # float(os.environ.get("TEMPERATURE", 0.5))
-    top_p: float = 0.9  # float(os.environ.get("TOP_P", 0.9))
+@dataclass
+class AWSNovaBody:
 
+    messages: list[AWSNovaMessage]
+    # inferenc: int = 1024
+    # maxTokens: int = 512
+    # stopSequences: list[str] = field(default_factory=list)
+    # temperature: float = 0.1
+    # topP: float = 1.0
 
 class BedrockHandler:
     """Handler that interacts with AWS Bedrock."""
@@ -165,13 +165,13 @@ class BedrockHandler:
     def generate_request(self: BedrockHandler, event: EventBridgeEvent) -> dict:
         """Generate a request for the Bedrock runtime."""
         return {
-            "modelId": "us.meta.llama3-3-70b-instruct-v1:0",
+            "modelId": "amazon.nova-micro-v1:0",
             "accept": "application/json",
             "contentType": "application/json",
             "body": json.dumps(
                 asdict(
-                    LLAMA3Prompt(
-                        PROMPT.format(event_string=json.dumps(asdict(event))),
+                    AWSNovaBody(
+                        messages=[AWSNovaMessage(content=[AWSNovaPrompt(text=PROMPT.format(event_string=json.dumps(asdict(event))))])],
                     ),
                 ),
             ),
@@ -179,9 +179,10 @@ class BedrockHandler:
 
     def get_response(self: BedrockHandler, event: EventBridgeEvent) -> str:
         """Get a response from the Bedrock runtime."""
+        print(self.generate_request(event))
         response = self.__bedrock_runtime.invoke_model(**self.generate_request(event))
         body = json.loads(response.get("body").read())
-        return body.get("generation")
+        return body.get("output").get("message").get("content")[0].get("text")
 
 
 class EventBridgeNotification(ChatBotNotification):
