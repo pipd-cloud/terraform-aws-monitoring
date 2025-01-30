@@ -37,7 +37,7 @@ variable "slack_channels" {
 }
 
 variable "slack_team" {
-  description = "The Slack Workspace ID associated with the slackbot."
+  description = "The Slack Workspace ID associated with the rockstar."
   type        = string
 }
 

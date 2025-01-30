@@ -66,14 +66,14 @@ resource "aws_vpc_security_group_egress_rule" "event_lambda_sg_full" {
 }
 
 resource "aws_lambda_function" "event_lambda" {
-  function_name = "${var.id}-slackbot-event-lambda"
+  function_name = "${var.id}-rockstar-event-lambda"
   filename      = data.archive_file.lambda.output_path
   handler       = "lambda.handler"
   runtime       = "python3.10"
   role          = aws_iam_role.event_lambda_role.arn
   tags = merge(
     {
-      Name = "${var.id}-slackbot-event-lambda"
+      Name = "${var.id}-rockstar-event-lambda"
       TFID = var.id
     },
     var.aws_tags
@@ -84,7 +84,7 @@ resource "aws_lambda_function" "event_lambda" {
   }
   environment {
     variables = {
-      TOPIC_ARN = aws_sns_topic.slackbot_topic.arn
+      TOPIC_ARN = aws_sns_topic.rockstar_topic.arn
     }
   }
 }
@@ -114,14 +114,14 @@ resource "aws_cloudwatch_event_rule" "events" {
   )
 }
 
-resource "aws_cloudwatch_event_target" "slackbot_lambda_target" {
+resource "aws_cloudwatch_event_target" "rockstar_lambda_target" {
   for_each = aws_cloudwatch_event_rule.events
   rule     = each.value.id
   arn      = aws_lambda_function.event_lambda.arn
 }
 
 ## Lambda Execution Policy
-resource "aws_lambda_permission" "slackbot_lambda_event_trigger" {
+resource "aws_lambda_permission" "rockstar_lambda_event_trigger" {
   for_each      = aws_cloudwatch_event_rule.events
   statement_id  = "Access_${each.key}"
   action        = "lambda:InvokeFunction"
@@ -135,7 +135,7 @@ resource "aws_lambda_permission" "slackbot_lambda_event_trigger" {
 
 # Chatbot
 ## SNS Topics
-resource "aws_sns_topic" "slackbot_topic" {
+resource "aws_sns_topic" "rockstar_topic" {
   name = var.id
   tags = merge(
     {
@@ -146,16 +146,16 @@ resource "aws_sns_topic" "slackbot_topic" {
   )
 }
 
-resource "aws_sns_topic_policy" "slackbot_topic_policy" {
-  arn    = aws_sns_topic.slackbot_topic.arn
-  policy = data.aws_iam_policy_document.slackbot_topic_policy.json
+resource "aws_sns_topic_policy" "rockstar_topic_policy" {
+  arn    = aws_sns_topic.rockstar_topic.arn
+  policy = data.aws_iam_policy_document.rockstar_topic_policy.json
 }
 
 
 ## IAM Role and Policies
-resource "aws_iam_role" "slackbot_role" {
+resource "aws_iam_role" "rockstar_role" {
   name_prefix        = "ChatbotRole_"
-  assume_role_policy = data.aws_iam_policy_document.slackbot_role_trust_policy.json
+  assume_role_policy = data.aws_iam_policy_document.rockstar_role_trust_policy.json
   tags = merge(
     {
       Name = "ChatbotRole"
@@ -165,10 +165,10 @@ resource "aws_iam_role" "slackbot_role" {
   )
 }
 
-resource "aws_iam_policy" "slackbot_role_inline_policy" {
+resource "aws_iam_policy" "rockstar_role_inline_policy" {
   name_prefix = "ChatbotReadOnlyAccess_"
   description = "Specific permissions that are granted to the ChatBot assumed role."
-  policy      = data.aws_iam_policy_document.slackbot_role_inline_policy.json
+  policy      = data.aws_iam_policy_document.rockstar_role_inline_policy.json
   tags = merge(
     {
       Name = "ChatbotReadOnlyAccess"
@@ -178,23 +178,23 @@ resource "aws_iam_policy" "slackbot_role_inline_policy" {
   )
 }
 
-resource "aws_iam_role_policy_attachment" "slackbot_managed_policies" {
-  for_each   = data.aws_iam_policy.slackbot_role_managed_policies
+resource "aws_iam_role_policy_attachment" "rockstar_managed_policies" {
+  for_each   = data.aws_iam_policy.rockstar_role_managed_policies
   policy_arn = each.value.arn
-  role       = aws_iam_role.slackbot_role.name
+  role       = aws_iam_role.rockstar_role.name
 }
 
-resource "aws_iam_role_policy_attachment" "slackbot_inline_policy" {
-  policy_arn = aws_iam_policy.slackbot_role_inline_policy.arn
-  role       = aws_iam_role.slackbot_role.name
+resource "aws_iam_role_policy_attachment" "rockstar_inline_policy" {
+  policy_arn = aws_iam_policy.rockstar_role_inline_policy.arn
+  role       = aws_iam_role.rockstar_role.name
 }
 
 ## Slack Channel integration
-resource "aws_chatbot_slack_channel_configuration" "slackbot_channel" {
+resource "aws_chatbot_slack_channel_configuration" "rockstar_channel" {
   for_each           = toset(var.slack_channels)
   configuration_name = "${var.id}-slack-channel-${each.value}"
-  iam_role_arn       = aws_iam_role.slackbot_role.arn
-  sns_topic_arns     = concat([aws_sns_topic.slackbot_topic.arn], var.sns_topic_arns)
+  iam_role_arn       = aws_iam_role.rockstar_role.arn
+  sns_topic_arns     = concat([aws_sns_topic.rockstar_topic.arn], var.sns_topic_arns)
   slack_team_id      = var.slack_team
   slack_channel_id   = each.value
   logging_level      = "ERROR"

@@ -12,7 +12,7 @@ data "archive_file" "lambda" {
   output_path = "${path.module}/${local.lambda_sha1}.zip"
 }
 
-data "aws_iam_policy_document" "slackbot_topic_policy" {
+data "aws_iam_policy_document" "rockstar_topic_policy" {
   statement {
     sid = "Default"
     actions = [
@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "slackbot_topic_policy" {
     }
 
     resources = [
-      aws_sns_topic.slackbot_topic.arn
+      aws_sns_topic.rockstar_topic.arn
     ]
 
   }
@@ -62,12 +62,12 @@ data "aws_iam_policy_document" "slackbot_topic_policy" {
     actions = ["sns:Publish"]
     effect  = "Allow"
     resources = [
-      aws_sns_topic.slackbot_topic.arn
+      aws_sns_topic.rockstar_topic.arn
     ]
   }
 }
 
-data "aws_iam_policy_document" "slackbot_role_trust_policy" {
+data "aws_iam_policy_document" "rockstar_role_trust_policy" {
   statement {
     principals {
       type        = "Service"
@@ -78,14 +78,14 @@ data "aws_iam_policy_document" "slackbot_role_trust_policy" {
   }
 }
 
-data "aws_iam_policy" "slackbot_role_managed_policies" {
+data "aws_iam_policy" "rockstar_role_managed_policies" {
   for_each = toset([
     "ReadOnlyAccess"
   ])
   name = each.value
 }
 
-data "aws_iam_policy_document" "slackbot_role_inline_policy" {
+data "aws_iam_policy_document" "rockstar_role_inline_policy" {
   statement {
     actions = [
       "cloudwatch:Describe*",
@@ -121,7 +121,7 @@ data "aws_iam_policy_document" "event_lambda_inline_policy" {
       "sns:Publish"
     ]
     effect    = "Allow"
-    resources = [aws_sns_topic.slackbot_topic.arn]
+    resources = [aws_sns_topic.rockstar_topic.arn]
   }
   statement {
     actions = [

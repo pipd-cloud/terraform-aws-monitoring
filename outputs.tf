@@ -1,4 +1,4 @@
-output "slackbot_sns_topic" {
+output "rockstar_sns_topic" {
   description = "The SNS topic associated with the Slack Chatbot."
-  value       = module.slackbot.slackbot_sns_topic
+  value       = module.rockstar.rockstar_sns_topic
 }

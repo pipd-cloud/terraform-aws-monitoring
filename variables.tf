@@ -11,7 +11,7 @@ variable "vpc_id" {
 }
 
 variable "vpc_subnet_ids" {
-  description = "The list of subnet IDs to use for the slackbot lambda functions."
+  description = "The list of subnet IDs to use for the rockstar lambda functions."
   type        = list(string)
 }
 
@@ -68,25 +68,25 @@ variable "trailwatch_alarm_actions" {
 
 
 
-## SlackBot
-variable "slackbot_team" {
+## rockstar
+variable "rockstar_team" {
   description = "The unique ID for the Slack Team on which to set up the AWS Chatbot integration."
   type        = string
 }
 
-variable "slackbot_channels" {
+variable "rockstar_channels" {
   description = "The unique ID for the Slack Channels to which to send notifications."
   type        = list(string)
   default     = []
 }
 
-variable "slackbot_events" {
+variable "rockstar_events" {
   description = "The events to trigger Slack messages for (EventBridge)."
   type        = map(string)
   default     = {}
 }
 
-variable "slackbot_topic_arns" {
+variable "rockstar_topic_arns" {
   description = "Additional SNS topics to listen to."
   type        = list(string)
   default     = []
