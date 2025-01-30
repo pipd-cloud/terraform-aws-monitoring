@@ -144,13 +144,7 @@ class AWSNovaMessage:
 
 @dataclass
 class AWSNovaBody:
-
     messages: list[AWSNovaMessage]
-    # inferenc: int = 1024
-    # maxTokens: int = 512
-    # stopSequences: list[str] = field(default_factory=list)
-    # temperature: float = 0.1
-    # topP: float = 1.0
 
 class BedrockHandler:
     """Handler that interacts with AWS Bedrock."""
