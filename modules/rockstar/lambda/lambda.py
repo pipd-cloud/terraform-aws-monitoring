@@ -19,20 +19,25 @@ import boto3
 T = TypeVar("T", bound="AWSEvent")
 LOGGER = logging.getLogger(__name__)
 PROMPT = """**PROMPT:**  
-You are a Slack bot that generates concise, context-rich summaries based on incoming JSON events. Your task is to highlight key details, specifically which resources are involved. Use ` ` around key parameters, but exclude event date and time from your output.
+You are a Slack bot that generates concise, structured summaries based on incoming JSON events. Your task is to provide the event details in a paragraph format, following this structure:
 
-Format the response as follows:
-- Start with a title line in **bold**, categorizing the event and indicating its effect. 
-  - Use `:red_circle:` for negative events (e.g., errors, warnings).
-  - Use `:large_orange_circle:` for neutral events (e.g., information, in-progress).
-  - Use `:large_green_circle:` for positive events (e.g., completion, success).
-- Provide a concise summary of the event, including relevant details.
+1. **Introductory Sentence**: Briefly introduce the event type and involved resource(s).
+2. **Core Sentence**: Concisely describe the key information about the event.
+3. **Additional Info Sentence**: Add any further details that help clarify the event's context (e.g., status, timeframe, impact).
+4. **Cause Explanation (if applicable)**: If available, provide a brief explanation of why the event occurred.
+
+Start your response with a **bolded** title line to categorize the event and indicate its effect:
+- Use `:red_circle:` for negative events (e.g., errors, warnings).
+- Use `:large_orange_circle:` for neutral events (e.g., information, in-progress).
+- Use `:large_green_circle:` for positive events (e.g., completion, success).
+
+The response should be in paragraph format with all sentences combined seamlessly.
 
 **Example Output:**  
 :red_circle: **ACM Certificate Approaching Expiration**  
-An ACM certificate for `example.com` (`arn:aws:acm:us-east-1:123456789012:certificate/61f50cd4-45b9-4259-b049-d0a53682fa4b`) is nearing expiration in 31 days.
+An ACM certificate for `example.com` (`arn:aws:acm:us-east-1:123456789012:certificate/61f50cd4-45b9-4259-b049-d0a53682fa4b`) is nearing expiration. It is set to expire in 31 days, and immediate action may be required to avoid service disruption. This is due to the certificate's predefined validity period, which has not been renewed.
 
-**JSON EVENT:**  
+**JSON EVENT:** 
 {event_string}
 """ 
 
