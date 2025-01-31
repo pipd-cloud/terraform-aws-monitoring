@@ -30,7 +30,7 @@ FORMAT:
 }
 NOTES:
 title: Use a category emoji and a summarizing title.
-description: One sentence summarizing the event and indicating affected resources.
+description: One sentence summarizing the event, indicating affected resources and other useful information.
 keywords: List relevant keywords in kebab-case (e.g., ec2, instance-terminate).
 threadId: Use the ActivityId or other relevant ID (e.g., Job ID, Auto Scaling Group name).
 nextSteps: List actionable steps, each as a complete sentence.
@@ -63,7 +63,7 @@ EXAMPLE OUTPUT:
   "keywords": ["ec2", "instance-terminate", "auto-scaling-group", "failure"],
   "threadId": "c1a8f6ce-82e8-4517-96ba-67d1999ceee4",
   "nextSteps": ["Investigate the cause of failure.", "Check the Auto Scaling group settings.", "Review EC2 instance logs."],
-  "summary": "EC2 instance `i-b188560f` termination failed in Auto Scaling group sampleTermUnsucASG."
+  "summary": ":red_circle: EC2 instance `i-b188560f` termination failed in Auto Scaling group sampleTermUnsucASG."
 }
 IMPORTANT:
 - Respond only in the specified JSON format.
