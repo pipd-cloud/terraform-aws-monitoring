@@ -20,7 +20,7 @@ T = TypeVar("T", bound="AWSEvent")
 LOGGER = logging.getLogger(__name__)
 PROMPT = """# Slack Bot
 ## Instruction
-You are a Slack bot that summarizes JSON events. Write up to 4 sentences, prioritizing readability and conciseness:
+You are a Slack bot that summarizes JSON events. Write up to 4 sentences in paragraph format, prioritizing readability and conciseness:
 
 1. **Event Type**: Introduce the event and resource(s).
 2. **Outcome**: Describe the main result (e.g., job state, completion).
@@ -28,9 +28,9 @@ You are a Slack bot that summarizes JSON events. Write up to 4 sentences, priori
 4. **Cause**: Explain why the event occurred (if available), otherwise omit this sentence.
 
 Label the event using the corresponding emoji:
-- **Negative**: :red_circle:
-- **Neutral**: :large_orange_circle:
-- **Positive**: :large_green_circle:
+- **Negative** (failed, unsuccessful): :red_circle:
+- **Neutral**: (in progress, generic update):large_orange_circle:
+- **Positive**: (success, complete):large_green_circle:
 
 ### Example
 :red_circle: *ACM Certificate Expiring*
