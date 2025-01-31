@@ -30,7 +30,7 @@ FORMAT:
 }
 NOTES:
 title: Use a category emoji and a summarizing title.  (:red_circle: Negative, :large_orange_circle: Neutral, :large_green_circle: Positive)
-description: One sentence summarizing the event.
+description: One sentence summarizing the event and indicating affected resources.
 keywords: List relevant keywords in kebab-case (e.g., ec2, instance-terminate).
 threadId: Use the ActivityId or other relevant ID (e.g., Job ID, Auto Scaling Group name).
 nextSteps: List actionable steps, each as a complete sentence.
