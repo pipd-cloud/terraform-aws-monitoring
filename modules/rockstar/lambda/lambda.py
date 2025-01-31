@@ -26,15 +26,21 @@ FORMAT:
   "keywords": ["keyword-1", "keyword-2", "keyword-3"],
   "threadId": "Use the ActivityId or another relevant ID.",
   "nextSteps": ["Next step 1.", "Next step 2.", "Next step 3."],
-  "summary": "A brief overview of what occurred."
+  "summary": ":category_emoji: A brief overview of what occurred."
 }
 NOTES:
-title: Use a category emoji and a summarizing title.  (:red_circle: Negative, :large_orange_circle: Neutral, :large_green_circle: Positive)
+title: Use a category emoji and a summarizing title.
 description: One sentence summarizing the event and indicating affected resources.
 keywords: List relevant keywords in kebab-case (e.g., ec2, instance-terminate).
 threadId: Use the ActivityId or other relevant ID (e.g., Job ID, Auto Scaling Group name).
 nextSteps: List actionable steps, each as a complete sentence.
-summary: Provide a concise event overview.
+summary: Use a category emoji and provide a concise event overview.
+
+EMOJI CATEGORIES:
+:red_circle: Negative
+:large_orange_circle: Neutral
+:large_green_circle: Positive
+
 EXAMPLE INPUT:
 {
   "detail-type": "EC2 Instance Terminate Unsuccessful",
