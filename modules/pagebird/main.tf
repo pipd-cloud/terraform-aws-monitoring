@@ -160,7 +160,7 @@ resource "aws_cloudwatch_metric_alarm" "trailwatch" {
   alarm_name          = "${var.id}-pagebird-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = var.cw_alarm_evaluation_periods
-  treat_missing_data  = "ignore"
+  treat_missing_data  = "notBreaching"
   alarm_description   = "Alarm that is raised whenever any of the website URLs provided for this deployment are down."
   alarm_actions       = var.cw_alarm_actions
   ok_actions          = var.cw_alarm_actions
