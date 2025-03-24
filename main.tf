@@ -7,6 +7,7 @@ module "rockstar" {
   events         = var.rockstar_events
   vpc_id         = var.vpc_id
   vpc_subnet_ids = var.vpc_subnet_ids
+  clean_up = var.clean_up
 }
 
 module "trailwatch" {
@@ -32,4 +33,5 @@ module "pagebird" {
   cw_alarm_actions            = concat([module.rockstar.rockstar_sns_topic.arn], var.pagebird_alarm_actions)
   cw_alarm_evaluation_periods = var.pagebird_alarm_evaluation_periods
   cw_alarm_period             = var.pagebird_alarm_period
+  clean_up = var.clean_up
 }

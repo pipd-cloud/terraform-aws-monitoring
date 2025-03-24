@@ -27,7 +27,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "canary_bucket_lifecycle" {
   bucket = aws_s3_bucket.canary_bucket.id
   rule {
     id = "stale-data"
-    filter {}
+    filter {
+      prefix = ""
+    }
     expiration {
       days = 30
     }
@@ -147,6 +149,7 @@ resource "aws_synthetics_canary" "canary" {
 }
 
 resource "null_resource" "cleanup" {
+  count = var.clean_up ? 1 : 0
   depends_on = [aws_s3_object.canary_script_object]
   triggers = {
     always = timestamp()

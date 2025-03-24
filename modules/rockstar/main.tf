@@ -92,6 +92,7 @@ resource "aws_lambda_function" "event_lambda" {
 
 
 resource "null_resource" "cleanup" {
+  count = var.clean_up ? 1 : 0
   depends_on = [aws_lambda_function.event_lambda]
   triggers = {
     always = timestamp()

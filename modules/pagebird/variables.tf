@@ -60,3 +60,9 @@ variable "cw_alarm_actions" {
   type        = list(string)
   default     = []
 }
+
+variable "clean_up" {
+  description = "Whether to clean up the temporary files."
+  type        = bool
+  default     = false
+}

@@ -46,3 +46,9 @@ variable "sns_topic_arns" {
   type        = list(string)
   default     = []
 }
+
+variable "clean_up" {
+  description = "Whether to clean up the temporary files."
+  type        = bool
+  default     = false
+}

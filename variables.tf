@@ -143,3 +143,9 @@ variable "pagebird_s3_access_logs_bucket" {
     error_message = "You must specify a bucket for S3 access logs if using pagebird."
   }
 }
+
+variable "clean_up" {
+  description = "Whether to clean up the temporary files."
+  type        = bool
+  default     = false
+}
